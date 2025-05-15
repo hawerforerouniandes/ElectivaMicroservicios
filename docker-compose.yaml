@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  usuarios:
+    build: ./usuarios
+    depends_on:
+      - redis
+    ports:
+      - "5050:5000"
+    volumes:
+      - ./usuarios:/app
+    working_dir: /app
+    command: python app.py
+
+  productos:
+    build: ./productos
+    depends_on:
+      - redis
+    ports:
+      - "5051:5000"
+    volumes:
+      - ./productos:/app
+    working_dir: /app
+    command: python app.py
+
+  ordenes:
+    build: ./ordenes
+    depends_on:
+      - redis
+    ports:
+      - "5052:5000"
+    volumes:
+      - ./ordenes:/app
+    working_dir: /app
+    command: python app.py
+
+  worker-usuarios:
+    build: ./usuarios
+    working_dir: /app
+    volumes:
+      - ./usuarios:/app
+    command: rq worker -u redis://redis/0
+    depends_on:
+      - redis
+
+  worker-productos:
+    build: ./productos
+    working_dir: /app
+    volumes:
+      - ./productos:/app
+    command: rq worker -u redis://redis/0
+    depends_on:
+      - redis
+
+  worker-ordenes:
+    build: ./ordenes
+    working_dir: /app
+    volumes:
+      - ./ordenes:/app
+    command: rq worker -u redis://redis/0
+    depends_on:
+      - redis
