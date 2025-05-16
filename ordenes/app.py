@@ -16,10 +16,14 @@ def crear_orden():
         return jsonify({'error': 'Faltan campos requeridos'}), 400
 
     usuario = Usuario.query.get(data['usuario'])
+    print("USUARIO:", data['usuario'])
     producto = Producto.query.get(data['producto'])
 
-    if usuario is None or producto is None:
-        return jsonify({'error': 'El usuario o producto no existe'}), 400
+    if usuario is None:
+        return jsonify({'error': 'El usuario no existe'}), 400
+    
+    if producto is None:
+        return jsonify({'error': 'El producto no existe'}), 400
 
     nueva = Orden(usuario=data['usuario'], producto=data['producto'], cantidad=data['cantidad'], estado="procesando")
     db.session.add(nueva)
